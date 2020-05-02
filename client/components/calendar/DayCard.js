@@ -34,6 +34,34 @@ const DayCard = props => {
       totalInfo: newTotalInfo
     })
   }
+  const removeMeal = meals => {
+    const db = firebase.firestore()
+
+    const dayRef = db.collection('days').doc(props.day.id)
+
+    let newMeals = meals
+    let newTotalInfo = newMeals.reduce(
+      (total, meal) => {
+        Object.keys(meal.totalInfo).forEach(info => {
+          total[info] = total[info] + meal.totalInfo[info]
+        })
+
+        return total
+      },
+      {
+        calories: 0,
+        carb: 0,
+        fat: 0,
+        protein: 0,
+        fiber: 0
+      }
+    )
+
+    dayRef.update({
+      meals: newMeals,
+      totalInfo: newTotalInfo
+    })
+  }
 
   const [{isOver}, drop] = useDrop({
     accept: ItemTypes.MEAL,
@@ -55,8 +83,16 @@ const DayCard = props => {
       <div className="day-card">
         <h2>{props.index}</h2>
         {props.day.meals.map((meal, index) => {
-          console.log(meal)
-          return <MealCard key={meal.id} meal={meal} />
+          return (
+            <MealCard
+              key={meal.id}
+              meal={meal}
+              removeMeal={removeMeal}
+              meals={props.day.meals.filter(
+                (meal, mealindex) => index !== mealindex
+              )}
+            />
+          )
         })}
       </div>
     </div>

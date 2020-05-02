@@ -24,7 +24,30 @@ export default class MealContainer extends Component {
   }
 
   addIngredient(ingredient) {
-    let newIngredients = [...this.state.ingredients, ingredient]
+    let newIngredients
+
+    if (
+      this.state.ingredients.filter(ing => ing.food_id === ingredient.food_id)
+        .length
+    ) {
+      newIngredients = this.state.ingredients.map(ing => {
+        if (ing.food_id === ingredient.food_id) {
+          return {
+            ...ing,
+            food_info: {
+              ...ing.food_info,
+              serving: (
+                Number(ing.food_info.serving) +
+                Number(ingredient.food_info.serving)
+              ).toFixed(2)
+            }
+          }
+        }
+        return ing
+      })
+    } else {
+      newIngredients = [...this.state.ingredients, ingredient]
+    }
 
     let totalInfo = newIngredients.reduce(
       (total, i) => {

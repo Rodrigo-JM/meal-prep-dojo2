@@ -17,6 +17,11 @@ export default function MealCard(props) {
 
   return (
     <li ref={drag} opacity={isDragging ? 0.5 : 1}>
+      {props.removeMeal && (
+        <button type="submit" onClick={() => props.removeMeal(props.meals)}>
+          X
+        </button>
+      )}
       <h2>{props.meal.name}</h2>
       <div className="meal-info-card">
         <ul>
