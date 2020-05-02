@@ -19,7 +19,7 @@ const createApp = () => {
   app.use(express.urlencoded({extended: true}))
 
   // compression middleware
-  app.use(compression())
+  // app.use(compression())
 
   // auth and api routes
   app.use('/api', require('./api'))
