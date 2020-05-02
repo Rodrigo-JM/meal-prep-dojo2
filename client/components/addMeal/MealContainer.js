@@ -20,6 +20,7 @@ export default class MealContainer extends Component {
 
     this.addIngredient = this.addIngredient.bind(this)
     this.submitMeal = this.submitMeal.bind(this)
+    this.handleChange = this.handleChange.bind(this)
   }
 
   addIngredient(ingredient) {
@@ -49,6 +50,11 @@ export default class MealContainer extends Component {
     })
   }
 
+  handleChange(e) {
+    this.setState({
+      name: e.target.value
+    })
+  }
   submitMeal(newMeal) {
     let db = firebase.firestore()
 
@@ -81,12 +87,7 @@ export default class MealContainer extends Component {
           </ul>
           <NewMealInfo totalInfo={this.state.totalInfo} />
           <div>
-            <input
-              placeholder="meal name"
-              onChange={function(e) {
-                this.setState({name: e.target.value})
-              }}
-            />
+            <input placeholder="meal name" onChange={this.handleChange} />
             <button
               type="submit"
               onClick={() => {
