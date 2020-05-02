@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import NewFoodMain from './NewFoodMain'
 import NewMealInfo from './NewMealInfo'
+import firebase from 'firebase'
 
 export default class MealContainer extends Component {
   constructor() {
@@ -17,10 +18,10 @@ export default class MealContainer extends Component {
     }
 
     this.addIngredient = this.addIngredient.bind(this)
+    this.submitMeal = this.submitMeal.bind(this)
   }
 
   addIngredient(ingredient) {
-    console.log(ingredient)
     let newIngredients = [...this.state.ingredients, ingredient]
 
     let totalInfo = newIngredients.reduce(
@@ -47,7 +48,25 @@ export default class MealContainer extends Component {
     })
   }
 
-  submitMeal() {}
+  submitMeal(newMeal) {
+    let db = firebase.firestore()
+
+    db
+      .collection('meals')
+      .where('user_id', '==', '1')
+      .limit(1)
+      .get()
+      .then(function(querySnapshot) {
+        querySnapshot.forEach(function(doc) {
+          db
+            .collection('meals')
+            .doc(doc.id)
+            .update({
+              meals: firebase.firestore.FieldValue.arrayUnion(newMeal)
+            })
+        })
+      })
+  }
 
   render() {
     console.log(this.state)
@@ -71,6 +90,14 @@ export default class MealContainer extends Component {
             })}
           </ul>
           <NewMealInfo totalInfo={this.state.totalInfo} />
+          <button
+            type="submit"
+            onClick={() => {
+              if (this.state.ingredients.length) {
+                this.submitMeal(this.state)
+              }
+            }}
+          />
         </div>
       </div>
     )

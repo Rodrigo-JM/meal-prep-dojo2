@@ -21,16 +21,18 @@ export default class App extends Component {
     const userMeals = db.collection('meals').where('user_id', '==', '1')
 
     userMeals
-      .onSnapshot(doc => {
-        const data = doc.data()
-        console.log(data)
+      .onSnapshot(docs => {
+        docs.forEach(doc => {
+          console.log(doc.data())
 
-        this.setState({meals: data})
+          this.setState({meals: doc.data().meals})
+        })
       })
       .bind(this)
   }
 
   render() {
+    console.log(this.state)
     return <MealContainer />
   }
 }
