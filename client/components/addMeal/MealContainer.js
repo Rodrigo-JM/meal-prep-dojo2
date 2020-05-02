@@ -65,7 +65,6 @@ export default class MealContainer extends Component {
   }
 
   render() {
-    console.log(this.state)
     return (
       <div>
         <div>

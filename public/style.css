@@ -58,3 +58,28 @@
 .new-meal-info {
   margin-left: 30px;
 }
+
+.calendar-grid {
+  height: 85vh;
+  margin-bottom: 200px;
+
+  display: grid;
+  gap: 1rem;
+
+  /* Explicit grid */
+  grid-template-areas:
+    'a b c d e f g'
+    'h i j k l m n'
+    'o p q r s t u'
+    'v w x y z A B'
+    'C D E F G H I';
+
+  grid-template-rows: repeat(5, 20%);
+  grid-template-columns: 240px auto auto 240px;
+}
+
+.meals-box-list {
+  width: 120px;
+  display: flex;
+  overflow-x: scroll;
+}

@@ -2,14 +2,20 @@
 import React, {Component} from 'react'
 import firebase from './firebase'
 import MealContainer from './components/addMeal/MealContainer'
-
+import {BrowserRouter as Router, Link, Route, Switch} from 'react-router-dom'
+import Calendar from './components/calendar/Calendar'
 export default class App extends Component {
   constructor() {
     super()
     this.state = {
       user: {},
       meals: [],
-      days: []
+      days: [
+        {
+          meals: [],
+          totalInfo: {}
+        }
+      ]
     }
   }
 
@@ -17,7 +23,6 @@ export default class App extends Component {
     const db = firebase.firestore()
 
     const userMeals = db.collection('meals').where('user_id', '==', '1')
-
     userMeals
       .onSnapshot(docs => {
         docs.forEach(doc => {
@@ -37,9 +42,11 @@ export default class App extends Component {
     const userDays = daysRef
       .where('user_id', '==', '1')
       .where('timestamp', '>=', today)
+      .orderBy('timestamp', 'asc')
 
     userDays
       .onSnapshot(docs => {
+        let days = []
         if (docs.size === 0) {
           for (let i = 0; i < 30; i++) {
             startedToday = true
@@ -67,17 +74,38 @@ export default class App extends Component {
             })
           }
         } else if (docs.size === 30) {
-          docs.get().then(all => {
-            this.setState({days: all})
+          docs.forEach(doc => {
+            days = [...days, {...doc.data(), id: doc.id}]
           })
         }
+        this.setState({days})
       })
       .bind(this)
   }
 
   render() {
-    console.log(this.state)
-    return <MealContainer />
+    return (
+      <Router>
+        <Switch>
+          <Route
+            exact
+            path="/"
+            render={props => (
+              <Calendar
+                {...props}
+                days={this.state.days}
+                meals={this.state.meals}
+                user={this.state.user}
+              />
+            )}
+          />
+          <Route
+            path="/meals"
+            render={() => <MealContainer user={this.state.user} />}
+          />
+        </Switch>
+      </Router>
+    )
   }
 }
 
