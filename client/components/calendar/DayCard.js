@@ -2,6 +2,12 @@ import React, {Component} from 'react'
 
 const grid = 'abcdefghijklmnopqrstuvwxyzABCD'
 export default class DayCard extends Component {
+  // updateMeals() {
+  //   //i have id for day document is there anuthing to be done with t?
+
+  //   this.props.meals =
+  // }
+
   render() {
     console.log(grid[this.props.index])
     return (
