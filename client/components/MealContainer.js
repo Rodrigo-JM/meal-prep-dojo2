@@ -7,6 +7,7 @@ export default class MealContainer extends Component {
   constructor() {
     super()
     this.state = {
+      name: '',
       totalInfo: {
         calories: 0,
         carb: 0,
@@ -25,11 +26,11 @@ export default class MealContainer extends Component {
     let newIngredients = [...this.state.ingredients, ingredient]
 
     let totalInfo = newIngredients.reduce(
-      (total, ingredient) => {
-        Object.keys(ingredient.food_info)
+      (total, i) => {
+        Object.keys(i.food_info)
           .filter(key => key !== 'serving')
           .forEach(info => {
-            total[info] = total[info] + Number(ingredient.food_info[info])
+            total[info] = total[info] + Number(i.food_info[info])
           })
 
         return total
@@ -51,21 +52,10 @@ export default class MealContainer extends Component {
   submitMeal(newMeal) {
     let db = firebase.firestore()
 
-    db
-      .collection('meals')
-      .where('user_id', '==', '1')
-      .limit(1)
-      .get()
-      .then(function(querySnapshot) {
-        querySnapshot.forEach(function(doc) {
-          db
-            .collection('meals')
-            .doc(doc.id)
-            .update({
-              meals: firebase.firestore.FieldValue.arrayUnion(newMeal)
-            })
-        })
-      })
+    db.collection('meals').add({
+      ...newMeal,
+      user_id: '1'
+    })
   }
 
   render() {
@@ -90,14 +80,22 @@ export default class MealContainer extends Component {
             })}
           </ul>
           <NewMealInfo totalInfo={this.state.totalInfo} />
-          <button
-            type="submit"
-            onClick={() => {
-              if (this.state.ingredients.length) {
-                this.submitMeal(this.state)
-              }
-            }}
-          />
+          <div>
+            <input
+              placeholder="meal name"
+              onChange={function(e) {
+                this.setState({name: e.target.value})
+              }}
+            />
+            <button
+              type="submit"
+              onClick={() => {
+                if (this.state.ingredients.length) {
+                  this.submitMeal(this.state)
+                }
+              }}
+            />
+          </div>
         </div>
       </div>
     )

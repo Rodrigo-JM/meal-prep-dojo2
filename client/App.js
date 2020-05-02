@@ -24,8 +24,8 @@ export default class App extends Component {
       .onSnapshot(docs => {
         docs.forEach(doc => {
           console.log(doc.data())
-
-          this.setState({meals: doc.data().meals})
+          let newMeals = [...this.state.meals, doc.data()]
+          this.setState({meals: newMeals})
         })
       })
       .bind(this)
