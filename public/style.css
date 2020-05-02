@@ -66,8 +66,9 @@
   display: grid;
   gap: 1rem;
 
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   /* Explicit grid */
-  grid-template-areas:
+  /* grid-template-areas:
     'a b c d e f g'
     'h i j k l m n'
     'o p q r s t u'
@@ -75,11 +76,25 @@
     'C D E F G H I';
 
   grid-template-rows: repeat(5, 20%);
-  grid-template-columns: 240px auto auto 240px;
+  grid-template-columns: auto auto auto auto auto auto auto; */
 }
 
 .meals-box-list {
-  width: 120px;
+  width: 100%;
   display: flex;
+  justify-content: center;
   overflow-x: scroll;
+  padding-bottom: 10px;
+  list-style: none;
+}
+
+.meals-box-list > li {
+  border: 1px solid grey;
+  margin: 1rem;
+  padding: 1rem;
+}
+
+.meals-box-container {
+  display: flex;
+  justify-content: center;
 }

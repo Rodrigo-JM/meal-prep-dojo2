@@ -25,11 +25,11 @@ export default class App extends Component {
     const userMeals = db.collection('meals').where('user_id', '==', '1')
     userMeals
       .onSnapshot(docs => {
+        let newMeals = this.state.meals
         docs.forEach(doc => {
-          console.log(doc.data())
-          let newMeals = [...this.state.meals, doc.data()]
-          this.setState({meals: newMeals})
+          newMeals = [...newMeals, {...doc.data(), meal_id: doc.id}]
         })
+        this.setState({meals: newMeals})
       })
       .bind(this)
 
