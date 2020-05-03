@@ -240,3 +240,14 @@ exports.updateHaulAssociatedRequirements = functions.firestore
       return null
     }
   })
+
+exports.createRequiredDataForNewUser = functions.auth.user().onCreate(user => {
+  return admin
+    .firestore()
+    .collection('grocery_bank')
+    .add({
+      hauls: [],
+      required_ingredients: {},
+      user_id: user.uid
+    })
+})

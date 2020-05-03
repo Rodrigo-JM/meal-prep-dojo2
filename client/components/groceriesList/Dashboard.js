@@ -36,6 +36,11 @@ export default class Dashboard extends Component {
     this.createGroceryList = this.createGroceryList.bind(this)
   }
 
+  componentDidMount() {
+    let today = newDateAt0()
+
+    this.setState({selectedDate: today})
+  }
   createGroceryList() {
     let db = firebase.firestore()
 
@@ -67,11 +72,13 @@ export default class Dashboard extends Component {
   }
 
   render() {
+    console.log('props on cl', this.props)
     return (
       <div>
         <ol>
           {Object.keys(this.props.total).map(ingredient => {
             let food = this.props.total[ingredient]
+            if (food === 'mapped') return ''
             return (
               <li>
                 {food.food_name} - {food.amount_needed}g
@@ -82,6 +89,7 @@ export default class Dashboard extends Component {
         <DatePicker
           setDate={this.setDate}
           hauls={this.props.grocery_bank.hauls}
+          mapRequirements={this.props.mapRequirements}
         />
 
         <button onClick={() => this.createGroceryList()}>
@@ -96,4 +104,11 @@ function toDateTime(secs) {
   var t = new Date(1970, 0, 1) // Epoch
   t.setSeconds(secs)
   return t
+}
+
+function newDateAt0() {
+  let date = new Date()
+  date.setHours(0, 0, 0, 0)
+
+  return date
 }

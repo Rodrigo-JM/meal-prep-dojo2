@@ -22,7 +22,8 @@ export default class App extends Component {
         hauls: [],
         required_ingredients: {}
       },
-      ingredients: {}
+      ingredients: {},
+      total: []
     }
 
     this.mapRequirementsToTotal = this.mapRequirementsToTotal.bind(this)
@@ -33,7 +34,7 @@ export default class App extends Component {
 
     const groceryBankRef = db
       .collection('grocery_bank')
-      .where('user_id', '==', '1')
+      .where('user_id', '==', this.props.user.uid)
 
     groceryBankRef
       .onSnapshot(docs => {
@@ -56,7 +57,9 @@ export default class App extends Component {
       })
       .bind(this)
 
-    const userMeals = db.collection('meals').where('user_id', '==', '1')
+    const userMeals = db
+      .collection('meals')
+      .where('user_id', '==', this.props.user.uid)
     userMeals
       .onSnapshot(docs => {
         let newMeals = []
@@ -85,7 +88,7 @@ export default class App extends Component {
     let startedToday = false
 
     const userDays = daysRef
-      .where('user_id', '==', '1')
+      .where('user_id', '==', this.props.user.uid)
       .where('timestamp', '>=', today)
       .orderBy('timestamp', 'asc')
 
@@ -100,7 +103,7 @@ export default class App extends Component {
 
             daysRef.add({
               timestamp: firebase.firestore.Timestamp.fromDate(newDay),
-              user_id: '1',
+              user_id: this.props.user.uid,
               meals: [],
               totalInfo: {}
             })
@@ -113,7 +116,7 @@ export default class App extends Component {
 
             daysRef.add({
               timestamp: firebase.firestore.Timestamp.fromDate(newDay),
-              user_id: '1',
+              user_id: this.props.user.uid,
               meals: [],
               totalInfo: {}
             })
@@ -128,14 +131,18 @@ export default class App extends Component {
       .bind(this)
   }
 
-  mapRequirementsToTotal() {
+  mapRequirementsToTotal(date, changeState = null) {
     const required = this.state.grocery_bank.required_ingredients
     let total = Object.keys(required).map(ing => {
       let item_timestamps = required[ing]
-      let totalPerItem = Object.keys(item_timestamps).reduce((t, i) => {
-        t += Number(item_timestamps[i])
-        return t
-      }, 0)
+      let totalPerItem = Object.keys(item_timestamps)
+        .filter(required_item_ts => {
+          return toDateTime(Number(required_item_ts)) >= date
+        })
+        .reduce((t, i) => {
+          t += Number(item_timestamps[i])
+          return t
+        }, 0)
 
       return {
         food_id: ing,
@@ -143,7 +150,11 @@ export default class App extends Component {
         amount_needed: totalPerItem.toFixed(2)
       }
     })
-
+    if (changeState) {
+      this.setState({
+        total: [...total.filter(ing => Number(ing.amount_needed) > 0), 'mapped']
+      })
+    }
     return total.filter(ing => Number(ing.amount_needed) > 0)
   }
 
@@ -160,13 +171,13 @@ export default class App extends Component {
                 {...props}
                 days={this.state.days}
                 meals={this.state.meals}
-                user={this.state.user}
+                user={this.props.user}
               />
             )}
           />
           <Route
             path="/meals"
-            render={() => <MealContainer user={this.state.user} />}
+            render={() => <MealContainer user={this.props.user} />}
           />
           <Route
             path="/groceries"
@@ -174,14 +185,17 @@ export default class App extends Component {
               <Dashboard
                 {...props}
                 days={this.state.days}
-                user={{user_id: '1'}}
+                user={this.props.user}
                 grocery_bank={this.state.grocery_bank}
                 ingredients={this.state.ingredients}
                 total={
-                  Object.keys(this.state.ingredients).length
-                    ? this.mapRequirementsToTotal()
-                    : {}
+                  this.state.total.includes('mapped')
+                    ? this.state.total
+                    : Object.keys(this.state.ingredients).length
+                      ? this.mapRequirementsToTotal(newDateAt0())
+                      : {}
                 }
+                mapRequirements={this.mapRequirementsToTotal}
               />
             )}
           />
@@ -194,5 +208,18 @@ export default class App extends Component {
 Date.prototype.addDays = function(days) {
   var date = new Date(this.valueOf())
   date.setDate(date.getDate() + days)
+  return date
+}
+
+function toDateTime(secs) {
+  var t = new Date(1970, 0, 1) // Epoch
+  t.setSeconds(secs)
+  return t
+}
+
+function newDateAt0() {
+  let date = new Date()
+  date.setHours(0, 0, 0, 0)
+
   return date
 }

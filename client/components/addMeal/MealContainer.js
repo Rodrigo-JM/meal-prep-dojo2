@@ -83,7 +83,7 @@ export default class MealContainer extends Component {
 
     db.collection('meals').add({
       ...newMeal,
-      user_id: '1'
+      user_id: this.props.user.uid
     })
   }
 
