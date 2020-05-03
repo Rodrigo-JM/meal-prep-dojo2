@@ -4,6 +4,7 @@ import firebase from './firebase'
 import MealContainer from './components/addMeal/MealContainer'
 import {BrowserRouter as Router, Link, Route, Switch} from 'react-router-dom'
 import Calendar from './components/calendar/Calendar'
+import Dashboard from './components/groceriesList/Dashboard'
 export default class App extends Component {
   constructor() {
     super()
@@ -17,11 +18,14 @@ export default class App extends Component {
         }
       ],
       grocery_bank: {
+        id: '',
         hauls: [],
         required_ingredients: {}
       },
       ingredients: {}
     }
+
+    this.mapRequirementsToTotal = this.mapRequirementsToTotal.bind(this)
   }
 
   componentDidMount() {
@@ -35,13 +39,16 @@ export default class App extends Component {
       .onSnapshot(docs => {
         let newHauls = []
         let newRequirements = {}
+        let id
         docs.forEach(doc => {
-          newHauls = [doc.data().hauls]
+          newHauls = doc.data().hauls
           newRequirements = {...doc.data().required_ingredients}
+          id = doc.id
         })
 
         this.setState({
           grocery_bank: {
+            id: id,
             hauls: newHauls,
             required_ingredients: newRequirements
           }
@@ -121,6 +128,25 @@ export default class App extends Component {
       .bind(this)
   }
 
+  mapRequirementsToTotal() {
+    const required = this.state.grocery_bank.required_ingredients
+    let total = Object.keys(required).map(ing => {
+      let item_timestamps = required[ing]
+      let totalPerItem = Object.keys(item_timestamps).reduce((t, i) => {
+        t += Number(item_timestamps[i])
+        return t
+      }, 0)
+
+      return {
+        food_id: ing,
+        food_name: this.state.ingredients[ing].food_name,
+        amount_needed: totalPerItem.toFixed(2)
+      }
+    })
+
+    return total.filter(ing => Number(ing.amount_needed) > 0)
+  }
+
   render() {
     console.log(this.state, 'meals')
     return (
@@ -141,6 +167,23 @@ export default class App extends Component {
           <Route
             path="/meals"
             render={() => <MealContainer user={this.state.user} />}
+          />
+          <Route
+            path="/groceries"
+            render={props => (
+              <Dashboard
+                {...props}
+                days={this.state.days}
+                user={{user_id: '1'}}
+                grocery_bank={this.state.grocery_bank}
+                ingredients={this.state.ingredients}
+                total={
+                  Object.keys(this.state.ingredients).length
+                    ? this.mapRequirementsToTotal()
+                    : {}
+                }
+              />
+            )}
           />
         </Switch>
       </Router>

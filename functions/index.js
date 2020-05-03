@@ -18,7 +18,8 @@ exports.updateIngredientRequirements = functions.firestore
           grocerieBag[ingredient.food_id] = Number(ingredient.food_info.serving)
         } else {
           grocerieBag[ingredient.food_id] =
-            grocerieBag[ingredient.food_id] + ingredient.food_info.serving
+            Number(grocerieBag[ingredient.food_id]) +
+            Number(ingredient.food_info.serving)
         }
       })
 
@@ -36,7 +37,8 @@ exports.updateIngredientRequirements = functions.firestore
           grocerieBag[ingredient.food_id] = Number(ingredient.food_info.serving)
         } else {
           grocerieBag[ingredient.food_id] =
-            grocerieBag[ingredient.food_id] + ingredient.food_info.serving
+            Number(grocerieBag[ingredient.food_id]) +
+            Number(ingredient.food_info.serving)
         }
       })
 
@@ -106,4 +108,135 @@ exports.updateIngredientRequirements = functions.firestore
     return docRef.update({
       required_ingredients: new_required_ingredients
     })
+  })
+
+exports.updateHaulAssociatedRequirements = functions.firestore
+  .document('grocery_bank/{docId}')
+  .onUpdate((change, context) => {
+    if (change.after.data().hauls.length > change.before.data().hauls.length) {
+      let [newHaul] = change.after
+        .data()
+        .hauls.filter(haul => haul.isActive && !haul.associatedRequirements)
+
+      let requirements = change.after.data().required_ingredients
+
+      newHaul.associatedRequirements = {}
+      console.log(newHaul)
+      console.log(newHaul.ingredients)
+
+      Object.keys(newHaul.ingredients).forEach(ingredient => {
+        let ingredient_in_requirements = Object.keys(requirements[ingredient])
+          .filter(time => {
+            return Number(time) >= Number(newHaul.timestamp._seconds)
+          })
+          .sort((a, b) => (a < b ? -1 : 1))
+
+        ingredient_in_requirements.forEach(req => {
+          let req_amount = Number(requirements[ingredient][req])
+          if (
+            req_amount > 0 &&
+            Number(newHaul.ingredients[ingredient].amount_needed) > 0
+          ) {
+            if (
+              Number(newHaul.ingredients[ingredient].amount_needed) -
+                req_amount >=
+              0
+            ) {
+              if (newHaul.associatedRequirements[ingredient] === undefined) {
+                newHaul.associatedRequirements[ingredient] = {
+                  [req]: requirements[ingredient][req]
+                }
+              } else {
+                newHaul.associatedRequirements[ingredient][req] =
+                  requirements[ingredient][req]
+              }
+
+              newHaul.ingredients[ingredient].amount_needed =
+                Number(newHaul.ingredients[ingredient].amount_needed) -
+                req_amount
+              requirements[ingredient][req] = '0.00'
+            } else {
+              if (newHaul.associatedRequirements[ingredient] === undefined) {
+                newHaul.associatedRequirements[ingredient] = {
+                  [req]: newHaul.ingredients[ingredient].amount_needed
+                }
+              } else {
+                newHaul.associatedRequirements[ingredient][req] =
+                  newHaul.ingredients[ingredient].amount_needed
+              }
+
+              newHaul.ingredients[ingredient].amount_needed = '0.00'
+              requirements[ingredient][req] =
+                req_amount -
+                Number(newHaul.ingredients[ingredient].amount_needed)
+            }
+          }
+        })
+      })
+
+      let updatedHauls = [
+        ...change.after
+          .data()
+          .hauls.filter(haul => haul.associatedRequirements),
+        newHaul
+      ]
+
+      let docRef = admin
+        .firestore()
+        .collection('grocery_bank')
+        .doc(context.params.docId)
+
+      return docRef.update({
+        hauls: updatedHauls,
+        required_ingredients: requirements
+      })
+    } else if (
+      change.after.data().hauls.length < change.before.data().hauls.length
+    ) {
+      let oldHaul =
+        change.after.data().hauls.length > 0
+          ? change.before.data().hauls.filter(haul => {
+              let presentInPastHauls = change.after
+                .data()
+                .hauls.find(
+                  newHaul =>
+                    newHaul.timestamp._seconds === haul.timestamp._seconds
+                )
+
+              if (!presentInPastHauls) {
+                return true
+              } else {
+                return false
+              }
+            })[0]
+          : change.before.data().hauls[0]
+
+      console.log(oldHaul)
+      let requirements = change.after.data().required_ingredients
+
+      Object.keys(oldHaul.associatedRequirements).forEach(item => {
+        let days = Object.keys(oldHaul.associatedRequirements[item])
+
+        days.forEach(day => {
+          let amount = Number(oldHaul.associatedRequirements[item][day])
+          console.log('item', item)
+          console.log('day', day)
+          console.log('amount', amount)
+          requirements[item][day] = (
+            Number(requirements[item][day]) + amount
+          ).toFixed(2)
+        })
+      })
+
+      let docRef = admin
+        .firestore()
+        .collection('grocery_bank')
+        .doc(context.params.docId)
+
+      return docRef.update({
+        required_ingredients: requirements
+      })
+    } else {
+      return null
+    }
   })
