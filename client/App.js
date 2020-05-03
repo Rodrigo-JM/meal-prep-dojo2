@@ -15,21 +15,59 @@ export default class App extends Component {
           meals: [],
           totalInfo: {}
         }
-      ]
+      ],
+      grocery_bank: {
+        hauls: [],
+        required_ingredients: {}
+      },
+      ingredients: {}
     }
   }
 
   componentDidMount() {
     const db = firebase.firestore()
 
+    const groceryBankRef = db
+      .collection('grocery_bank')
+      .where('user_id', '==', '1')
+
+    groceryBankRef
+      .onSnapshot(docs => {
+        let newHauls = []
+        let newRequirements = {}
+        docs.forEach(doc => {
+          newHauls = [doc.data().hauls]
+          newRequirements = {...doc.data().required_ingredients}
+        })
+
+        this.setState({
+          grocery_bank: {
+            hauls: newHauls,
+            required_ingredients: newRequirements
+          }
+        })
+      })
+      .bind(this)
+
     const userMeals = db.collection('meals').where('user_id', '==', '1')
     userMeals
       .onSnapshot(docs => {
-        let newMeals = this.state.meals
+        let newMeals = []
         docs.forEach(doc => {
           newMeals = [...newMeals, {...doc.data(), meal_id: doc.id}]
         })
-        this.setState({meals: newMeals})
+
+        let ingredients = newMeals.reduce((ingredients, meal) => {
+          meal.ingredients.forEach(ingredient => {
+            if (ingredients[ingredient.food_id] === undefined) {
+              ingredients[ingredient.food_id] = ingredient
+            }
+          })
+
+          return ingredients
+        }, {})
+
+        this.setState({meals: newMeals, ingredients: ingredients})
       })
       .bind(this)
 
@@ -84,6 +122,7 @@ export default class App extends Component {
   }
 
   render() {
+    console.log(this.state, 'meals')
     return (
       <Router>
         <Switch>

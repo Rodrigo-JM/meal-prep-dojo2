@@ -28,7 +28,8 @@ exports.updateIngredientRequirements = functions.firestore
     const newDayObj = change.after.data()
 
     let userId = newDayObj.user_id
-
+    let timestamp = `${newDayObj.timestamp._seconds}`
+    console.log(timestamp)
     let newRequirement = newDayObj.meals.reduce((grocerieBag, meal) => {
       meal.ingredients.forEach(ingredient => {
         if (grocerieBag[ingredient.food_id] === undefined) {
@@ -76,11 +77,20 @@ exports.updateIngredientRequirements = functions.firestore
 
       changedItems.forEach(item => {
         if (required_ingredients[item.food_id] === undefined) {
-          required_ingredients[item.food_id] = item.change.toFixed(2)
+          required_ingredients[item.food_id] = {
+            [timestamp]: item.change.toFixed(2)
+          }
         } else {
-          required_ingredients[item.food_id] = (
-            Number(required_ingredients[item.food_id]) + Number(item.change)
-          ).toFixed(2)
+          if (required_ingredients[item.food_id][timestamp] === undefined) {
+            required_ingredients[item.food_id][timestamp] = item.change.toFixed(
+              2
+            )
+          } else {
+            required_ingredients[item.food_id][timestamp] = (
+              Number(required_ingredients[item.food_id][timestamp]) +
+              Number(item.change)
+            ).toFixed(2)
+          }
         }
       })
 
