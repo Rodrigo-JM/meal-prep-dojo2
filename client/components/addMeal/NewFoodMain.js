@@ -55,6 +55,8 @@ export default class NewFoodMain extends Component {
   }
 
   sendResults(data) {
+    console.log('data', data)
+    console.log('type', typeof data)
     const {foods} = JSON.parse(data)
 
     let foodsArr = foods.food.map(food => {
