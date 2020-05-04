@@ -29,7 +29,7 @@ export default class PrepareMeal extends Component {
           foodInfo.serving = amount.toFixed(2)
         } else {
           foodInfo[info.match(/\w+?(?=[_])/g)[0]] = (
-            ingredient.food_info[info] * amount
+            Number(ingredient.food_info[info]) * Number(amount)
           ).toFixed(2)
         }
         return foodInfo
@@ -79,8 +79,7 @@ export default class PrepareMeal extends Component {
   render() {
     return this.props.selected.food_name ? (
       <div>
-        <label>Food: {this.props.selected.food_name}</label>
-        <form onSubmit={this.handleSubmit}>
+        <form className="new-ingredient-form" onSubmit={this.handleSubmit}>
           <input
             name="quantity"
             placeholder="Quantity"
@@ -96,6 +95,9 @@ export default class PrepareMeal extends Component {
           </select>
           <button type="submit">Add Food</button>
         </form>
+        <label className="food-name">
+          Food: {this.props.selected.food_name}
+        </label>
         <FoodInfoCard
           food={this.props.selected}
           amount={

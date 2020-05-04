@@ -5,6 +5,8 @@ import MealContainer from './components/addMeal/MealContainer'
 import {BrowserRouter as Router, Link, Route, Switch} from 'react-router-dom'
 import Calendar from './components/calendar/Calendar'
 import Dashboard from './components/groceriesList/Dashboard'
+import Navbar from './NavBar'
+
 export default class App extends Component {
   constructor() {
     super()
@@ -23,12 +25,26 @@ export default class App extends Component {
         required_ingredients: {}
       },
       ingredients: {},
-      total: []
+      total: [],
+      removeToggled: false
     }
 
     this.mapRequirementsToTotal = this.mapRequirementsToTotal.bind(this)
+    this.toggleRemove = this.toggleRemove.bind(this)
   }
 
+  async deleteMeal(mealId) {
+    const db = firebase.firestore()
+
+    await db
+      .collection('meals')
+      .doc(mealId)
+      .delete()
+  }
+
+  toggleRemove() {
+    this.setState({removeToggled: !this.state.removeToggled})
+  }
   componentDidMount() {
     const db = firebase.firestore()
 
@@ -47,12 +63,27 @@ export default class App extends Component {
           id = doc.id
         })
 
+        let total = Object.keys(newRequirements).map(ing => {
+          let item_timestamps = newRequirements[ing]
+          let totalPerItem = Object.keys(item_timestamps).reduce((t, i) => {
+            t += Number(item_timestamps[i])
+            return t
+          }, 0)
+
+          return {
+            food_id: ing,
+            food_name: 'placeHolder',
+            amount_needed: totalPerItem.toFixed(2)
+          }
+        })
+        console.log('total', total)
         this.setState({
           grocery_bank: {
             id: id,
             hauls: newHauls,
             required_ingredients: newRequirements
-          }
+          },
+          total: total
         })
       })
       .bind(this)
@@ -133,6 +164,7 @@ export default class App extends Component {
 
   mapRequirementsToTotal(date, changeState = null) {
     const required = this.state.grocery_bank.required_ingredients
+    console.log(require)
     let total = Object.keys(required).map(ing => {
       let item_timestamps = required[ing]
       let totalPerItem = Object.keys(item_timestamps)
@@ -146,7 +178,9 @@ export default class App extends Component {
 
       return {
         food_id: ing,
-        food_name: this.state.ingredients[ing].food_name,
+        food_name: this.state.ingredients[ing]
+          ? this.state.ingredients[ing].food_name
+          : '',
         amount_needed: totalPerItem.toFixed(2)
       }
     })
@@ -162,44 +196,48 @@ export default class App extends Component {
     console.log(this.state, 'meals')
     return (
       <Router>
-        <Switch>
-          <Route
-            exact
-            path="/"
-            render={props => (
-              <Calendar
-                {...props}
-                days={this.state.days}
-                meals={this.state.meals}
-                user={this.props.user}
-              />
-            )}
-          />
-          <Route
-            path="/meals"
-            render={() => <MealContainer user={this.props.user} />}
-          />
-          <Route
-            path="/groceries"
-            render={props => (
-              <Dashboard
-                {...props}
-                days={this.state.days}
-                user={this.props.user}
-                grocery_bank={this.state.grocery_bank}
-                ingredients={this.state.ingredients}
-                total={
-                  this.state.total.includes('mapped')
-                    ? this.state.total
-                    : Object.keys(this.state.ingredients).length
-                      ? this.mapRequirementsToTotal(newDateAt0())
-                      : {}
-                }
-                mapRequirements={this.mapRequirementsToTotal}
-              />
-            )}
-          />
-        </Switch>
+        <Navbar />
+        <div className="main">
+          <Switch>
+            <Route
+              exact
+              path="/"
+              render={props => (
+                <Calendar
+                  {...props}
+                  days={this.state.days}
+                  meals={this.state.meals}
+                  user={this.props.user}
+                  deleteMeal={this.deleteMeal}
+                  toggleRemove={this.toggleRemove}
+                  removeToggled={this.state.removeToggled}
+                />
+              )}
+            />
+            <Route
+              path="/meals"
+              render={() => <MealContainer user={this.props.user} />}
+            />
+            <Route
+              path="/groceries"
+              render={props => (
+                <Dashboard
+                  {...props}
+                  days={this.state.days}
+                  user={this.props.user}
+                  grocery_bank={this.state.grocery_bank}
+                  ingredients={this.state.ingredients}
+                  toggleRemove={this.toggleRemove}
+                  removeToggled={this.state.removeToggled}
+                  total={this.state.total.filter(
+                    ing => ing !== 'mapped' && ing.amount_needed !== '0.00'
+                  )}
+                  mapRequirements={this.mapRequirementsToTotal}
+                />
+              )}
+            />
+          </Switch>
+        </div>
       </Router>
     )
   }

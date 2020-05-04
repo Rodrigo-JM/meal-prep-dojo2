@@ -3,6 +3,7 @@ import {useDrop} from 'react-dnd'
 import {ItemTypes} from '../../utils/items'
 import MealCard from './MealCard'
 import firebase from 'firebase'
+import DailyMacros from './DailyMacros'
 const grid = 'abcdefghijklmnopqrstuvwxyzABCD'
 
 const DayCard = props => {
@@ -34,7 +35,7 @@ const DayCard = props => {
       totalInfo: newTotalInfo
     })
   }
-  const removeMeal = meals => {
+  const removeMealfromDay = meals => {
     const db = firebase.firestore()
 
     const dayRef = db.collection('days').doc(props.day.id)
@@ -80,23 +81,32 @@ const DayCard = props => {
       }}
       ref={drop}
     >
-      <div className="day-card">
-        <h2>{props.index}</h2>
+      <ul className="day-card">
+        <p>{toDateTime(props.day.timestamp).getDate()}</p>
         {props.day.meals.map((meal, index) => {
           return (
             <MealCard
               key={meal.id}
               meal={meal}
-              removeMeal={removeMeal}
+              removeMealFromDay={removeMealfromDay}
               meals={props.day.meals.filter(
                 (meal, mealindex) => index !== mealindex
               )}
             />
           )
         })}
-      </div>
+      </ul>
+      {props.day.meals.length > 0 && (
+        <DailyMacros totalInfo={props.day.totalInfo} />
+      )}
     </div>
   )
 }
 
 export default DayCard
+
+function toDateTime(secs) {
+  var t = new Date(1970, 0, 1) // Epoch
+  t.setSeconds(secs)
+  return t
+}

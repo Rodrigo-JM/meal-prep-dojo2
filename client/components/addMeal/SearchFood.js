@@ -23,7 +23,7 @@ export default class SearchFood extends Component {
 
   render() {
     return (
-      <div>
+      <div className="search">
         <input
           type="text"
           placeholder="search food"

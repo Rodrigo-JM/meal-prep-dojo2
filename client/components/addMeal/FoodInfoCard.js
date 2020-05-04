@@ -6,12 +6,17 @@ export default function FoodInfoCard(props) {
     : []
   console.log(props)
   return (
-    <ul>
+    <ul className="food-info-list">
       {filterKeys.map((info, index) => {
         return (
-          <li key={props.food && props.food.food_id + index}>
-            {info.match(/\w+?(?=[_])/g)[0]}:{' '}
-            {(props.food.food_info[info] * props.amount).toFixed(2)}
+          <li
+            className="food-info-item"
+            key={props.food && props.food.food_id + index}
+          >
+            <span>{info.match(/\w+?(?=[_])/g)[0]}: </span>
+            <span>
+              {(props.food.food_info[info] * props.amount).toFixed(2)}
+            </span>
           </li>
         )
       })}

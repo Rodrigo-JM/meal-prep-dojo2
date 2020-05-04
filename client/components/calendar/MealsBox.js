@@ -6,7 +6,14 @@ export default function MealsBox(props) {
     <div className="meals-box-container">
       <ul className="meals-box-list">
         {props.meals.map((meal, index) => {
-          return <MealCard key={index} meal={meal} />
+          return (
+            <MealCard
+              key={index}
+              removeToggled={props.removeToggled}
+              meal={meal}
+              deleteMeal={props.deleteMeal}
+            />
+          )
         })}
       </ul>
     </div>

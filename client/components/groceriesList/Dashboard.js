@@ -24,7 +24,7 @@
 import React, {Component} from 'react'
 import firebase from 'firebase'
 import {DatePicker} from './DatePicker'
-
+import HaulsBox from './HaulsBox'
 export default class Dashboard extends Component {
   constructor() {
     super()
@@ -74,27 +74,53 @@ export default class Dashboard extends Component {
   render() {
     console.log('props on cl', this.props)
     return (
-      <div>
-        <ol>
-          {Object.keys(this.props.total).map(ingredient => {
-            let food = this.props.total[ingredient]
-            if (food === 'mapped') return ''
-            return (
-              <li>
-                {food.food_name} - {food.amount_needed}g
-              </li>
-            )
-          })}
-        </ol>
-        <DatePicker
-          setDate={this.setDate}
-          hauls={this.props.grocery_bank.hauls}
-          mapRequirements={this.props.mapRequirements}
-        />
-
-        <button onClick={() => this.createGroceryList()}>
-          Create Groceries List
-        </button>
+      <div className="dashboard">
+        <div className="dashboard-up">
+          <div>
+            <ol className="food-info-list">
+              {Object.keys(this.props.ingredients).length &&
+                this.props.total.map(ingredient => {
+                  if (ingredient === 'mapped') return null
+                  if (!this.props.ingredients[ingredient.food_id]) return null
+                  console.log(ingredient)
+                  return (
+                    <li className="food-info-item" key={ingredient.food_id}>
+                      {this.props.ingredients[ingredient.food_id].food_name} -{' '}
+                      {ingredient.amount_needed}g
+                    </li>
+                  )
+                })}
+            </ol>
+            <button
+              className="create-grocery-button"
+              onClick={() => this.createGroceryList()}
+            >
+              Create Groceries List
+            </button>
+          </div>
+          <div>
+            <DatePicker
+              setDate={this.setDate}
+              hauls={this.props.grocery_bank.hauls}
+              mapRequirements={this.props.mapRequirements}
+            />
+          </div>
+        </div>
+        <div className="dashboard-down">
+          <div className="planner-nav">
+            <h2>Your Groceries Lists</h2>
+            <i
+              className="fa fa-minus-square"
+              onClick={() => this.props.toggleRemove()}
+            />
+          </div>
+          <HaulsBox
+            user={this.props.user}
+            hauls={this.props.grocery_bank.hauls}
+            ingredients={this.props.ingredients}
+            removeToggled={this.props.removeToggled}
+          />
+        </div>
       </div>
     )
   }

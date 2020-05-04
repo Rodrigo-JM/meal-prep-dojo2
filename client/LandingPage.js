@@ -3,10 +3,6 @@ import GetStarted from './GetStarted'
 
 export default class LandingPage extends Component {
   render() {
-    return (
-      <div>
-        <GetStarted />
-      </div>
-    )
+    return <GetStarted />
   }
 }

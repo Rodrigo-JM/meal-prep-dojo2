@@ -52,6 +52,7 @@ router.get('/select/:itemId', async (req, res, next) => {
       }
     }
     requestPromise(options).then(response => {
+      console.log(response)
       res.json(response)
     })
   } catch (err) {

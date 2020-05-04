@@ -89,35 +89,41 @@ export default class MealContainer extends Component {
 
   render() {
     return (
-      <div>
-        <div>
-          <h2>Ingredients:</h2>
+      <div className="meal-section">
+        <div className="meal-section-up">
           <NewFoodMain addIngredient={this.addIngredient} />
         </div>
-        <div className="new-meal-container">
-          <h2>New Meal</h2>
-          <ul className="list-results">
-            {this.state.ingredients.map(ingredient => {
-              return (
-                <li className="food-card" key={ingredient.food_id}>
-                  <p>{ingredient.food_name}</p>
-                  <p>kcal: {ingredient.food_info.calories}</p>
-                  <p>grams: {ingredient.food_info.serving}</p>
-                </li>
-              )
-            })}
-          </ul>
-          <NewMealInfo totalInfo={this.state.totalInfo} />
-          <div>
-            <input placeholder="meal name" onChange={this.handleChange} />
-            <button
-              type="submit"
-              onClick={() => {
-                if (this.state.ingredients.length) {
-                  this.submitMeal(this.state)
-                }
-              }}
-            />
+        <div className="meal-section-down">
+          <div className="new-meal-list">
+            <h2>New Meal</h2>
+            <ul className="list-results">
+              {this.state.ingredients.map(ingredient => {
+                return (
+                  <li className="food-card" key={ingredient.food_id}>
+                    <p>{ingredient.food_name}</p>
+                    <p>kcal: {ingredient.food_info.calories}</p>
+                    <p>grams: {ingredient.food_info.serving}</p>
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+          <div className="new-meal-info">
+            <h2>Meal Name:</h2>
+            <div className="new-meal-mini-form">
+              <input placeholder="meal name" onChange={this.handleChange} />
+              <button
+                type="submit"
+                onClick={() => {
+                  if (this.state.ingredients.length) {
+                    this.submitMeal(this.state)
+                  }
+                }}
+              >
+                Submit
+              </button>
+            </div>
+            <NewMealInfo totalInfo={this.state.totalInfo} />
           </div>
         </div>
       </div>

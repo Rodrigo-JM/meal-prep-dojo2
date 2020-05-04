@@ -8,8 +8,23 @@ export default class Calendar extends Component {
     console.log(this.props)
     return (
       <div>
+        <div className="planner-nav">
+          <h2>Planner</h2>
+          <i
+            className="fa fa-minus-square"
+            onClick={() => this.props.toggleRemove()}
+          />
+          <i
+            onClick={() => this.props.history.push('/meals')}
+            className="fa fa-plus-square add-meal-icon"
+          />
+        </div>
         <div>
-          <MealsBox meals={this.props.meals} />
+          <MealsBox
+            removeToggled={this.props.removeToggled}
+            meals={this.props.meals}
+            deleteMeal={this.props.deleteMeal}
+          />
         </div>
 
         <div className="calendar-grid">

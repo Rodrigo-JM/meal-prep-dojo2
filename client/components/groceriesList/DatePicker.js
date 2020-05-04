@@ -25,11 +25,13 @@ export const DatePicker = props => {
   return (
     <div>
       <Calendar
-        showWeekNumbers
         minDate={new Date()}
         tileDisabled={checkForPastHauls}
         onChange={onChange}
         value={date}
+        className={['disabledNav']}
+        showNavigation={false}
+        tileClassName={['calendar-tile']}
       />
       {date.toString()}
     </div>

@@ -39,7 +39,7 @@ export default class NewFoodMain extends Component {
           Number(serving.protein) / Number(serving.metric_serving_amount),
         fiber_per_gram:
           Number(serving.fiber) / Number(serving.metric_serving_amount),
-        size: serving.metric_serving_amount
+        size: Number(serving.metric_serving_amount)
       }
 
       return serving
@@ -69,17 +69,21 @@ export default class NewFoodMain extends Component {
   render() {
     return (
       <div className="new-food-menu">
-        <div>
+        <div className="new-ingredient-search">
+          <h2>Ingredients:</h2>
           <SearchFood sendResults={this.sendResults} />
           <ViewResults
             results={this.state.results}
             selectFood={this.selectFood}
           />
         </div>
-        <PrepareMeal
-          addIngredient={this.props.addIngredient}
-          selected={this.state.selected}
-        />
+        <div className="ingredient-board">
+          <h2>Ingredient Macros</h2>
+          <PrepareMeal
+            addIngredient={this.props.addIngredient}
+            selected={this.state.selected}
+          />
+        </div>
       </div>
     )
   }
