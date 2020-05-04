@@ -31,11 +31,13 @@ export default function Auth() {
   }
 
   return (
-    <div>
-      <span onClick={() => selectMethod('login')}>Log In</span>
-      <span onClick={() => selectMethod('signup')}> Sign Up</span>
+    <div className="auth">
+      <div>
+        <span onClick={() => selectMethod('login')}>Log In</span>
+        <span onClick={() => selectMethod('signup')}> Sign Up</span>
+      </div>
 
-      <form onSubmit={authUser}>
+      <form className="auth-form" onSubmit={authUser}>
         <label>E-mail</label>
         <input placeholder="email" name="email" />
         <label>Password</label>
