@@ -119,6 +119,7 @@
 .ingredient-board {
   display: flex;
   flex-direction: column;
+  flex-wrap: wrap;
 }
 
 .food-card:hover {
@@ -226,6 +227,7 @@
   width: 100%;
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 .new-meal-list {
@@ -234,6 +236,7 @@
 
 .new-meal-container {
   display: flex;
+  flex-wrap: wrap;
 }
 
 .new-meal-info {
@@ -252,10 +255,20 @@
   width: 10rem;
   transition: all 200ms;
 }
-
 .ingredients-card {
   position: absolute;
   display: none;
+}
+
+.daily-macro {
+  padding: 1rem;
+  font-size: 18px;
+  padding-top: 0px;
+}
+
+.daily-macro > h2 {
+  padding-inline-start: 0px;
+  margin-block-start: 0em;
 }
 
 .meal-list {
@@ -403,7 +416,7 @@
 }
 
 :root {
-  font-size: 20px;
+  font-size: 18px;
   font-family: 'Roboto', sans-serif;
   --text-primary: #b6b6b6;
   --text-secondary: #ececec;
@@ -485,12 +498,14 @@ ul::-webkit-scrollbar-thumb {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
 }
 .meal-section-down {
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: flex-start;
+  flex-wrap: wrap;
 }
 
 .grocery-list > ul > li {
@@ -560,23 +575,6 @@ body {
   justify-content: space-between;
 }
 
-.day-container:hover > .ingredients-card {
-  transform: translateX(250px);
-  display: block;
-  background-color: whitesmoke;
-  padding: 2rem;
-  border-radius: 8px;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  /* width: 13rem; */
-  transition: all 200ms;
-  border: 2px solid black;
-  font-size: 24px;
-}
-
 .main {
   margin-left: 10rem;
   margin-top: 5rem;
@@ -592,6 +590,7 @@ body {
   -webkit-box-shadow: -5px 2px 36px 2px rgba(45, 56, 36, 1);
   -moz-box-shadow: -5px 2px 36px 2px rgba(45, 56, 36, 1);
   box-shadow: -5px 2px 36px 2px rgba(45, 56, 36, 1);
+  height: 200%;
 }
 
 .navbar {
@@ -712,8 +711,35 @@ body {
   }
 }
 
+@media only screen and (min-width: 600px) and (max-width: 1000px) {
+  .navbar {
+    top: 0;
+    width: 5rem;
+    height: 100vh;
+  }
+
+  .main {
+    height: 550%;
+  }
+  .navbar:hover {
+    width: 16rem;
+  }
+
+  .navbar:hover .link-text {
+    display: inline;
+  }
+
+  .navbar:hover .logo svg {
+    margin-left: 11rem;
+  }
+
+  .navbar:hover .logo-text {
+    left: 0px;
+  }
+}
+
 /* Large screens */
-@media only screen and (min-width: 600px) {
+@media only screen and (min-width: 1000px) {
   .navbar {
     top: 0;
     width: 5rem;

@@ -83,6 +83,11 @@ const DayCard = props => {
     >
       <ul className="day-card">
         <p>{toDateTime(props.day.timestamp).getDate()}</p>
+        {props.day.meals.length > 0 && (
+          <li>
+            <DailyMacros totalInfo={props.day.totalInfo} />
+          </li>
+        )}
         {props.day.meals.map((meal, index) => {
           return (
             <MealCard
@@ -96,9 +101,6 @@ const DayCard = props => {
           )
         })}
       </ul>
-      {props.day.meals.length > 0 && (
-        <DailyMacros totalInfo={props.day.totalInfo} />
-      )}
     </div>
   )
 }
