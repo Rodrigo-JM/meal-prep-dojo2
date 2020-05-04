@@ -7,15 +7,18 @@ export default class MealContainer extends Component {
   constructor() {
     super()
     this.state = {
-      name: '',
-      totalInfo: {
-        calories: 0,
-        carb: 0,
-        fat: 0,
-        protein: 0,
-        fiber: 0
+      meal: {
+        name: '',
+        totalInfo: {
+          calories: 0,
+          carb: 0,
+          fat: 0,
+          protein: 0,
+          fiber: 0
+        },
+        ingredients: []
       },
-      ingredients: []
+      submitted: false
     }
 
     this.addIngredient = this.addIngredient.bind(this)
@@ -27,10 +30,11 @@ export default class MealContainer extends Component {
     let newIngredients
 
     if (
-      this.state.ingredients.filter(ing => ing.food_id === ingredient.food_id)
-        .length
+      this.state.meal.ingredients.filter(
+        ing => ing.food_id === ingredient.food_id
+      ).length
     ) {
-      newIngredients = this.state.ingredients.map(ing => {
+      newIngredients = this.state.meal.ingredients.map(ing => {
         if (ing.food_id === ingredient.food_id) {
           return {
             ...ing,
@@ -46,7 +50,7 @@ export default class MealContainer extends Component {
         return ing
       })
     } else {
-      newIngredients = [...this.state.ingredients, ingredient]
+      newIngredients = [...this.state.meal.ingredients, ingredient]
     }
 
     let totalInfo = newIngredients.reduce(
@@ -67,20 +71,29 @@ export default class MealContainer extends Component {
         fiber: 0
       }
     )
-    this.setState({
+    let mealchange = {
+      ...this.state.meal,
       ingredients: newIngredients,
       totalInfo
+    }
+    this.setState({
+      meal: mealchange
     })
   }
 
   handleChange(e) {
-    this.setState({
+    let meal = {
+      ...this.state.meal,
       name: e.target.value
+    }
+    this.setState({
+      meal: meal
     })
   }
   submitMeal(newMeal) {
     let db = firebase.firestore()
 
+    this.setState({submitted: true})
     db.collection('meals').add({
       ...newMeal,
       user_id: this.props.user.uid
@@ -97,7 +110,7 @@ export default class MealContainer extends Component {
           <div className="new-meal-list">
             <h2>New Meal</h2>
             <ul className="list-results">
-              {this.state.ingredients.map(ingredient => {
+              {this.state.meal.ingredients.map(ingredient => {
                 return (
                   <li className="food-card" key={ingredient.food_id}>
                     <p>{ingredient.food_name}</p>
@@ -115,15 +128,15 @@ export default class MealContainer extends Component {
               <button
                 type="submit"
                 onClick={() => {
-                  if (this.state.ingredients.length) {
-                    this.submitMeal(this.state)
+                  if (this.state.meal.ingredients.length) {
+                    this.submitMeal(this.state.meal)
                   }
                 }}
               >
                 Submit
               </button>
             </div>
-            <NewMealInfo totalInfo={this.state.totalInfo} />
+            <NewMealInfo totalInfo={this.state.meal.totalInfo} />
           </div>
         </div>
       </div>

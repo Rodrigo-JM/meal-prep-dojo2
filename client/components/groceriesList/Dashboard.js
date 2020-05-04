@@ -77,11 +77,17 @@ export default class Dashboard extends Component {
       <div className="dashboard">
         <div className="dashboard-up">
           <div>
-            <ol className="food-info-list">
+            <ol className="grocery-info-list">
+              {this.props.total.length === 0 && (
+                <li>
+                  <h2>You don't have any requirements for this day!</h2>
+                </li>
+              )}
               {Object.keys(this.props.ingredients).length &&
                 this.props.total.map(ingredient => {
-                  if (ingredient === 'mapped') return null
-                  if (!this.props.ingredients[ingredient.food_id]) return null
+                  console.log('ingre', ingredient)
+                  if (ingredient === 'mapped') return ''
+                  if (!this.props.ingredients[ingredient.food_id]) return ''
                   console.log(ingredient)
                   return (
                     <li className="food-info-item" key={ingredient.food_id}>
@@ -92,6 +98,7 @@ export default class Dashboard extends Component {
                 })}
             </ol>
             <button
+              // disabled={this.props.total.length === 0 ? false : true}
               className="create-grocery-button"
               onClick={() => this.createGroceryList()}
             >

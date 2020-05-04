@@ -10,6 +10,9 @@ export default class Calendar extends Component {
       <div>
         <div className="planner-nav">
           <h2>Planner</h2>
+          <p className="message-planner">
+            Drag and drop meals into your calendar
+          </p>
           <i
             className="fa fa-minus-square"
             onClick={() => this.props.toggleRemove()}

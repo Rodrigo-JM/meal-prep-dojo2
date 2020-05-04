@@ -172,6 +172,19 @@
   padding-right: 10px;
   display: inline;
 }
+
+.grocery-info-list {
+  padding-inline-start: 0px;
+  width: 100%;
+  font-size: 20px;
+}
+
+.grocery-info-list > li {
+  font-size: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
 .food-info-list {
   list-style: none;
   padding-inline-start: 0px;
@@ -464,19 +477,91 @@ ul::-webkit-scrollbar-thumb {
   background: #7dd71c;
 }
 
-.auth {
+.little-main {
   width: 100%;
   height: 100%;
-  font-size: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth {
+  transform: translateY(-100px);
+  width: 300px;
+  height: 500px;
+  font-size: 18px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-around;
+  background-color: var(--bg-primary);
+  color: white;
+  border-radius: 10px;
 }
 
-.auth-from {
+.auth-menu > h2 {
+  display: inline;
+  margin: 15px;
+  padding: 10px;
+}
+
+.message-planner {
+  margin-right: auto;
+}
+
+.selected-auth {
+  background-color: blue;
+  color: white;
+  font-weight: bold;
+  height: 45px;
+  width: 80px;
+  text-align: center;
+}
+
+.auth-form {
   display: flex;
   flex-direction: column;
+  color: whitesmoke;
+}
+
+.auth-form > input {
+  height: 40px;
+  border-radius: 8px;
+  border: 0px;
+  margin: 5px;
+}
+
+.auth-form > button {
+  height: 40px;
+  border-radius: 8px;
+  border: 0px;
+  margin: 5px;
+  background-color: blue;
+  color: white;
+  font-weight: bold;
+  transition: all 400ms;
+  opacity: 0.8;
+}
+
+.auth-form > button:hover {
+  opacity: 1;
+}
+
+.auth > button {
+  height: 40px;
+  border-radius: 8px;
+  border: 0px;
+  margin: 5px;
+  background-color: red;
+  color: white;
+  font-weight: bold;
+  transition: all 400ms;
+  opacity: 0.8;
+}
+
+.auth > button:hover {
+  opacity: 1;
 }
 
 .dashboard {

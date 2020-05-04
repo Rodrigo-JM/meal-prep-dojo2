@@ -31,25 +31,37 @@ export default function Auth() {
   }
 
   return (
-    <div className="auth">
-      <div>
-        <span onClick={() => selectMethod('login')}>Log In</span>
-        <span onClick={() => selectMethod('signup')}> Sign Up</span>
-      </div>
+    <div className="little-main">
+      <div className="auth">
+        <div className="auth-menu">
+          <h2
+            className={method === 'login' && 'selected-auth'}
+            onClick={() => selectMethod('login')}
+          >
+            Log In
+          </h2>
+          <h2
+            className={method !== 'login' && 'selected-auth'}
+            onClick={() => selectMethod('signup')}
+          >
+            {' '}
+            Sign Up
+          </h2>
+        </div>
+        <form className="auth-form" onSubmit={authUser}>
+          <label>E-mail</label>
+          <input placeholder="email" name="email" />
+          <label>Password</label>
+          <input placeholder="password" name="password" />
+          <button type="submit">
+            {method === 'login' ? 'Log In' : 'Sign Up'}
+          </button>
+        </form>
 
-      <form className="auth-form" onSubmit={authUser}>
-        <label>E-mail</label>
-        <input placeholder="email" name="email" />
-        <label>Password</label>
-        <input placeholder="password" name="password" />
-        <button type="submit">
-          {method === 'login' ? 'Log In' : 'Sign Up'}
+        <button type="button" onClick={() => googleLogin()}>
+          Or SignUp With Google
         </button>
-      </form>
-
-      <button type="button" onClick={() => googleLogin()}>
-        Or SignUp With Google
-      </button>
+      </div>
     </div>
   )
 }
