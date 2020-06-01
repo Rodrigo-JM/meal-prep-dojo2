@@ -19,7 +19,6 @@ export const DatePicker = props => {
   const onChange = date => {
     setDate(date)
     props.setDate(date)
-    props.mapRequirements(date, true)
   }
   console.log(pastHauls)
   return (

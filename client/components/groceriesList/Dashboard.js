@@ -1,26 +1,3 @@
-//basically, i need to loop over the required ingredients, for each ingredient, order the time stamps and keep adding
-//subtract if there is a grocery haul with same timestamp
-//when creating a haul, whenever we go for dealing with a requirement, we have a list for food_ids, and timestamps, like we
-//have on the requirements. if they match, we subtract, if result is 0, we are good, if its negative, we have a problem.
-//if we don't have a key for that day, then we need to
-
-//we can also have a total of an item, and loop over the requirements. when we reach negative, we flag the timestamp
-//we need to display the total needed, first.
-
-//i wanna take all the requirements that have a timestamp greater than today
-//i want to check for a an active haul - an active haul is one haul that is not dead
-//a dead haul is when all associated timestamps have passed
-//when a haul is created, we have the total amount of items.
-//we would a have cloud function that would run everytime a grocery haul is created
-//that function will go item by item, checking future requirements
-//basically, i will check requirements for that item tha have a greater timestamp
-//if they have a posive requirement, then subtract that from the total,
-//if we can subtract the total amount, get the requirement to 0
-//if not, requirement = requirement - what we have on the haul
-//and add that to the associated_requirements object
-//if a haul is deleted;
-//we want to add the associated requirements back to the required_ingredients
-
 import React, {Component} from 'react'
 import firebase from 'firebase'
 import {DatePicker} from './DatePicker'
@@ -39,14 +16,44 @@ export default class Dashboard extends Component {
   componentDidMount() {
     let today = newDateAt0()
 
-    this.setState({selectedDate: today})
+    this.setState({
+      selectedDate: today,
+      total: this.mapRequirementsToTotal(today)
+    })
   }
+
+  mapRequirementsToTotal(date) {
+    const required = this.props.grocery_bank.required_ingredients
+
+    let total = Object.keys(required).map(ing => {
+      let item_timestamps = required[ing]
+      let totalPerItem = Object.keys(item_timestamps)
+        .filter(required_item_ts => {
+          return toDateTime(Number(required_item_ts)) >= date
+        })
+        .reduce((t, i) => {
+          t += Number(item_timestamps[i])
+          return t
+        }, 0)
+
+      return {
+        food_id: ing,
+        food_name: this.state.ingredients[ing]
+          ? this.state.ingredients[ing].food_name
+          : '',
+        amount_needed: totalPerItem.toFixed(2)
+      }
+    })
+
+    return total.filter(ing => Number(ing.amount_needed) > 0)
+  }
+
   createGroceryList() {
     let db = firebase.firestore()
 
     let bankRef = db.collection('grocery_bank').doc(this.props.grocery_bank.id)
 
-    let haulItems = this.props.total.reduce((h, item) => {
+    let haulItems = this.state.total.reduce((h, item) => {
       h[item.food_id] = item
 
       return h
@@ -68,23 +75,25 @@ export default class Dashboard extends Component {
   }
 
   setDate(date) {
-    this.setState({selectedDate: new Date(date)})
+    this.setState({
+      selectedDate: new Date(date),
+      total: this.mapRequirementsToTotal(date)
+    })
   }
 
   render() {
-    console.log('props on cl', this.props)
     return (
       <div className="dashboard">
         <div className="dashboard-up">
           <div>
             <ol className="grocery-info-list">
-              {this.props.total.length === 0 && (
+              {this.state.total.length === 0 && (
                 <li>
                   <h2>You don't have any requirements for this day!</h2>
                 </li>
               )}
               {Object.keys(this.props.ingredients).length &&
-                this.props.total.map(ingredient => {
+                this.state.total.map(ingredient => {
                   console.log('ingre', ingredient)
                   if (ingredient === 'mapped') return ''
                   if (!this.props.ingredients[ingredient.food_id]) return ''
@@ -98,7 +107,8 @@ export default class Dashboard extends Component {
                 })}
             </ol>
             <button
-              // disabled={this.props.total.length === 0 ? false : true}
+              // disabled={this.state.total.length === 0 ? false : true}
+              type="submit"
               className="create-grocery-button"
               onClick={() => this.createGroceryList()}
             >
@@ -109,7 +119,7 @@ export default class Dashboard extends Component {
             <DatePicker
               setDate={this.setDate}
               hauls={this.props.grocery_bank.hauls}
-              mapRequirements={this.props.mapRequirements}
+              mapRequirements={this.mapRequirements}
             />
           </div>
         </div>
