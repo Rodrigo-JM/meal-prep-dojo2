@@ -4,13 +4,15 @@ import Calendar from 'react-calendar'
 export const DatePicker = props => {
   const [date, setDate] = useState(new Date())
 
-  const pastHauls = props.hauls.map(haul => {
-    let date = toDateTime(haul.timestamp.seconds)
+  const pastHauls = props.hauls
+    ? props.hauls.map(haul => {
+        let date = toDateTime(haul.timestamp.seconds)
 
-    date.setHours(0, 0, 0, 0)
+        date.setHours(0, 0, 0, 0)
 
-    return date.getDate()
-  })
+        return date.getDate()
+      })
+    : []
 
   const checkForPastHauls = e => {
     return pastHauls.includes(e.date.getDate())
@@ -19,9 +21,8 @@ export const DatePicker = props => {
   const onChange = date => {
     setDate(date)
     props.setDate(date)
-    props.mapRequirements(date, true)
   }
-  console.log(pastHauls)
+
   return (
     <div>
       <Calendar
