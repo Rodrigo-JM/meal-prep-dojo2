@@ -2,26 +2,8 @@ const router = require('express').Router()
 const requestPromise = require('request-promise')
 const axios = require('axios')
 
-// const Socks = require('socks')
-
-// const fixieUrl = process.env.FIXIE_SOCKS_HOST
-// const fixieValues = fixieUrl.split(new RegExp('[/(:\\/@)/]+'))
-
-// const socksAgent = new Socks.Agent(
-//   {
-//     proxy: {
-//       ipaddress: fixieValues[2],
-//       port: fixieValues[3],
-//       type: 5,
-//       authentication: {
-//         username: fixieValues[0],
-//         password: fixieValues[1]
-//       }
-//     }
-//   },
-//   true, // true HTTPS server, false for HTTP server
-//   false // rejectUnauthorized option passed to tls.connect()
-// )
+let socksAgent =
+  process.env.NODE_ENV === 'production' ? require('../socks.js') : {}
 
 router.get('/search/:value', async (req, res, next) => {
   try {
@@ -36,11 +18,15 @@ router.get('/search/:value', async (req, res, next) => {
       },
       headers: {
         'Content-Type': 'application/json',
-        Authorization:
-          'Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjQ1MjZBMkFCNkQ0MkQ5REIwMjBEMThBRDMxRTE5MTdCMUUzMjg2RTUiLCJ0eXAiOiJhdCtqd3QiLCJ4NXQiOiJSU2FpcTIxQzJkc0NEUml0TWVHUmV4NHlodVUifQ.eyJuYmYiOjE1OTEwNDYyNDIsImV4cCI6MTU5MTEzMjY0MiwiaXNzIjoiaHR0cHM6Ly9vYXV0aC5mYXRzZWNyZXQuY29tIiwiYXVkIjoiYmFzaWMiLCJjbGllbnRfaWQiOiI5ZDljMTRlNTU1NzM0YjMzYmJmMmY1ZWU2YmVmMjg2ZSIsInNjb3BlIjpbImJhc2ljIl19.I2NB4E2BAIY5Di1XI3WXD68gejaqSr1srVSg4CHdtp4xkzoLizzfiCa9jm_lUeu6ZbKZ7g9FW3Z6LEfl0qnfa08KhEU4kmK9JK9riN7p_w5KtlN4cwad_sZ0x9nwp6zcCpoCAa6KcIXL10wjjYuxftbIqeEkwHhS7qcFRL5lxoCgOjFxEXAnJLW3amCEKB7KYZg5cFmWBVM7hqteUcE_SSejpGPeeHtOVec4KxV-YNSxi45-TvVp5RZrB-XB3tjiDxRk2_y7EVVoOSeh0xXTFuybUnyyWOpYStnvyZKDbyydb33QnUEln_xvJ3J6GDO3WsPNPxfUIdb9mj9lWf3HJw'
+        Authorization: `Bearer ${process.env.NEW_TOKEN ||
+          'eyJhbGciOiJSUzI1NiIsImtpZCI6IjQ1MjZBMkFCNkQ0MkQ5REIwMjBEMThBRDMxRTE5MTdCMUUzMjg2RTUiLCJ0eXAiOiJhdCtqd3QiLCJ4NXQiOiJSU2FpcTIxQzJkc0NEUml0TWVHUmV4NHlodVUifQ.eyJuYmYiOjE1OTExMjcwNjgsImV4cCI6MTU5MTIxMzQ2OCwiaXNzIjoiaHR0cHM6Ly9vYXV0aC5mYXRzZWNyZXQuY29tIiwiYXVkIjoiYmFzaWMiLCJjbGllbnRfaWQiOiI5ZDljMTRlNTU1NzM0YjMzYmJmMmY1ZWU2YmVmMjg2ZSIsInNjb3BlIjpbImJhc2ljIl19.jzkBsfYe9wEFuXxjgFAmLi1fJd_i95s8xpwdj8Y27dEl4go46Hmz1tKrAnd7YWEoOKoJc1wCYCRyy93aosc-E4ZGaZB4vajSpQ_t3bWQ-kneWi9mqNPMmnW1QfmphJqx0Khc8LTcMI3x78iMVY5TAHHBTeJnb4gDqAd72YfnY9h2tEfW0qeKMVvNqSkAQL4BgbtSrk4TrDOOov1fE2KF_HTfsaLB37nKZ-Ht43ECfALFmSgo7ORjKA9-66_1CR9aLDwR7hvEJuDLMhn_5I1EUU7XN5Jex8p5PJxGFj3sX1o4l8djs6HY65tLrFk-D9Jev4VNI1_JMvigZzQwSBdIFQ'}`
       }
-      // agent: socksAgent
     }
+
+    if (process.env.NODE_ENV === 'production') {
+      options.agent = socksAgent
+    }
+
     requestPromise(options).then(response => {
       res.json(response)
     })
@@ -61,11 +47,15 @@ router.get('/select/:itemId', async (req, res, next) => {
       },
       headers: {
         'Content-Type': 'application/json',
-        Authorization:
-          'Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjQ1MjZBMkFCNkQ0MkQ5REIwMjBEMThBRDMxRTE5MTdCMUUzMjg2RTUiLCJ0eXAiOiJhdCtqd3QiLCJ4NXQiOiJSU2FpcTIxQzJkc0NEUml0TWVHUmV4NHlodVUifQ.eyJuYmYiOjE1OTEwNDYyNDIsImV4cCI6MTU5MTEzMjY0MiwiaXNzIjoiaHR0cHM6Ly9vYXV0aC5mYXRzZWNyZXQuY29tIiwiYXVkIjoiYmFzaWMiLCJjbGllbnRfaWQiOiI5ZDljMTRlNTU1NzM0YjMzYmJmMmY1ZWU2YmVmMjg2ZSIsInNjb3BlIjpbImJhc2ljIl19.I2NB4E2BAIY5Di1XI3WXD68gejaqSr1srVSg4CHdtp4xkzoLizzfiCa9jm_lUeu6ZbKZ7g9FW3Z6LEfl0qnfa08KhEU4kmK9JK9riN7p_w5KtlN4cwad_sZ0x9nwp6zcCpoCAa6KcIXL10wjjYuxftbIqeEkwHhS7qcFRL5lxoCgOjFxEXAnJLW3amCEKB7KYZg5cFmWBVM7hqteUcE_SSejpGPeeHtOVec4KxV-YNSxi45-TvVp5RZrB-XB3tjiDxRk2_y7EVVoOSeh0xXTFuybUnyyWOpYStnvyZKDbyydb33QnUEln_xvJ3J6GDO3WsPNPxfUIdb9mj9lWf3HJw'
+        Authorization: `Bearer ${process.env.NEW_TOKEN ||
+          'eyJhbGciOiJSUzI1NiIsImtpZCI6IjQ1MjZBMkFCNkQ0MkQ5REIwMjBEMThBRDMxRTE5MTdCMUUzMjg2RTUiLCJ0eXAiOiJhdCtqd3QiLCJ4NXQiOiJSU2FpcTIxQzJkc0NEUml0TWVHUmV4NHlodVUifQ.eyJuYmYiOjE1OTExMjcwNjgsImV4cCI6MTU5MTIxMzQ2OCwiaXNzIjoiaHR0cHM6Ly9vYXV0aC5mYXRzZWNyZXQuY29tIiwiYXVkIjoiYmFzaWMiLCJjbGllbnRfaWQiOiI5ZDljMTRlNTU1NzM0YjMzYmJmMmY1ZWU2YmVmMjg2ZSIsInNjb3BlIjpbImJhc2ljIl19.jzkBsfYe9wEFuXxjgFAmLi1fJd_i95s8xpwdj8Y27dEl4go46Hmz1tKrAnd7YWEoOKoJc1wCYCRyy93aosc-E4ZGaZB4vajSpQ_t3bWQ-kneWi9mqNPMmnW1QfmphJqx0Khc8LTcMI3x78iMVY5TAHHBTeJnb4gDqAd72YfnY9h2tEfW0qeKMVvNqSkAQL4BgbtSrk4TrDOOov1fE2KF_HTfsaLB37nKZ-Ht43ECfALFmSgo7ORjKA9-66_1CR9aLDwR7hvEJuDLMhn_5I1EUU7XN5Jex8p5PJxGFj3sX1o4l8djs6HY65tLrFk-D9Jev4VNI1_JMvigZzQwSBdIFQ'}`
       }
-      // agent: socksAgent
     }
+
+    if (process.env.NODE_ENV === 'production') {
+      options.agent = socksAgent
+    }
+
     requestPromise(options).then(response => {
       console.log(response)
       res.json(response)
