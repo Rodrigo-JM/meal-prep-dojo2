@@ -1,4 +1,5 @@
 import firebase from 'firebase'
+import {mapTotal} from './total'
 
 const SET_GROCERY_BANK = 'SET_GROCERY_BANK'
 
@@ -21,6 +22,7 @@ export const setUserGroceryBank = user => {
       let newHauls = []
       let newRequirements = {}
       let id
+
       docs.forEach(doc => {
         newHauls = doc.data().hauls
         newRequirements = {...doc.data().required_ingredients}
@@ -34,8 +36,16 @@ export const setUserGroceryBank = user => {
           required_ingredients: newRequirements
         })
       )
+
+      dispatch(mapTotal(newRequirements))
     })
   }
+}
+
+let initialState = {
+  hauls: [],
+  required_ingredients: {},
+  id: ''
 }
 
 const groceryBankReducer = (state = {}, action) => {

@@ -47,7 +47,6 @@ class App extends Component {
   }
 
   render() {
-    console.log(this.state, 'meals')
     return (
       <Bouncer>
         <Router>

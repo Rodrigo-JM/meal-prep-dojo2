@@ -2,7 +2,11 @@ import React, {Component} from 'react'
 import firebase from 'firebase'
 import {DatePicker} from './DatePicker'
 import HaulsBox from './HaulsBox'
-export default class Dashboard extends Component {
+import Bouncer from 'react-data-bouncer'
+import {connect} from 'react-redux'
+import {mapTotal} from '../../store/total'
+
+class Dashboard extends Component {
   constructor() {
     super()
     this.state = {
@@ -17,35 +21,8 @@ export default class Dashboard extends Component {
     let today = newDateAt0()
 
     this.setState({
-      selectedDate: today,
-      total: this.mapRequirementsToTotal(today)
+      selectedDate: today
     })
-  }
-
-  mapRequirementsToTotal(date) {
-    const required = this.props.grocery_bank.required_ingredients
-
-    let total = Object.keys(required).map(ing => {
-      let item_timestamps = required[ing]
-      let totalPerItem = Object.keys(item_timestamps)
-        .filter(required_item_ts => {
-          return toDateTime(Number(required_item_ts)) >= date
-        })
-        .reduce((t, i) => {
-          t += Number(item_timestamps[i])
-          return t
-        }, 0)
-
-      return {
-        food_id: ing,
-        food_name: this.state.ingredients[ing]
-          ? this.state.ingredients[ing].food_name
-          : '',
-        amount_needed: totalPerItem.toFixed(2)
-      }
-    })
-
-    return total.filter(ing => Number(ing.amount_needed) > 0)
   }
 
   createGroceryList() {
@@ -53,7 +30,7 @@ export default class Dashboard extends Component {
 
     let bankRef = db.collection('grocery_bank').doc(this.props.grocery_bank.id)
 
-    let haulItems = this.state.total.reduce((h, item) => {
+    let haulItems = this.props.total.reduce((h, item) => {
       h[item.food_id] = item
 
       return h
@@ -75,70 +52,86 @@ export default class Dashboard extends Component {
   }
 
   setDate(date) {
+    let d = new Date(date)
+
+    d.setHours(0, 0, 0, 0)
+
     this.setState({
-      selectedDate: new Date(date),
-      total: this.mapRequirementsToTotal(date)
+      selectedDate: d
     })
+
+    this.props.mapTotal(this.props.grocery_bank.required_ingredients, d)
   }
 
   render() {
+    console.log(this.props)
     return (
-      <div className="dashboard">
-        <div className="dashboard-up">
-          <div>
-            <ol className="grocery-info-list">
-              {this.state.total.length === 0 && (
-                <li>
-                  <h2>You don't have any requirements for this day!</h2>
-                </li>
-              )}
-              {Object.keys(this.props.ingredients).length &&
-                this.state.total.map(ingredient => {
-                  console.log('ingre', ingredient)
-                  if (ingredient === 'mapped') return ''
-                  if (!this.props.ingredients[ingredient.food_id]) return ''
-                  console.log(ingredient)
-                  return (
-                    <li className="food-info-item" key={ingredient.food_id}>
-                      {this.props.ingredients[ingredient.food_id].food_name} -{' '}
-                      {ingredient.amount_needed}g
-                    </li>
-                  )
-                })}
-            </ol>
-            <button
-              // disabled={this.state.total.length === 0 ? false : true}
-              type="submit"
-              className="create-grocery-button"
-              onClick={() => this.createGroceryList()}
-            >
-              Create Groceries List
-            </button>
+      <Bouncer>
+        <div className="dashboard">
+          <div className="dashboard-up">
+            <div>
+              <ol className="grocery-info-list">
+                {this.props.total.length === 0 ? (
+                  <li>
+                    <h2>You don't have any requirements for this day!</h2>
+                  </li>
+                ) : (
+                  Object.keys(this.props.ingredients).length &&
+                  this.props.total.map(ingredient => {
+                    console.log('ingre', ingredient)
+                    if (!this.props.ingredients[ingredient.food_id]) return ''
+                    console.log(ingredient)
+                    return (
+                      <li className="food-info-item" key={ingredient.food_id}>
+                        {this.props.ingredients[ingredient.food_id].food_name} -{' '}
+                        {ingredient.amount_needed}g
+                      </li>
+                    )
+                  })
+                )}
+              </ol>
+              <button
+                // disabled={this.state.total.length === 0 ? false : true}
+                type="submit"
+                className="create-grocery-button"
+                onClick={() => this.createGroceryList()}
+              >
+                Create Groceries List
+              </button>
+            </div>
+            <div>
+              <DatePicker
+                setDate={this.setDate}
+                hauls={
+                  this.props.grocery_bank.hauls
+                    ? this.props.grocery_bank.hauls
+                    : []
+                }
+                mapRequirements={this.mapRequirements}
+              />
+            </div>
           </div>
-          <div>
-            <DatePicker
-              setDate={this.setDate}
-              hauls={this.props.grocery_bank.hauls}
-              mapRequirements={this.mapRequirements}
+          <div className="dashboard-down">
+            <div className="planner-nav">
+              <h2>Your Groceries Lists</h2>
+              <i
+                className="fa fa-minus-square"
+                onClick={() => this.props.toggleRemove()}
+              />
+            </div>
+            <HaulsBox
+              user={this.props.user}
+              hauls={
+                this.props.grocery_bank.hauls
+                  ? this.props.grocery_bank.hauls
+                  : []
+              }
+              ingredients={this.props.ingredients}
+              removeToggled={this.props.removeToggled}
             />
           </div>
         </div>
-        <div className="dashboard-down">
-          <div className="planner-nav">
-            <h2>Your Groceries Lists</h2>
-            <i
-              className="fa fa-minus-square"
-              onClick={() => this.props.toggleRemove()}
-            />
-          </div>
-          <HaulsBox
-            user={this.props.user}
-            hauls={this.props.grocery_bank.hauls}
-            ingredients={this.props.ingredients}
-            removeToggled={this.props.removeToggled}
-          />
-        </div>
-      </div>
+      </Bouncer>
     )
   }
 }
@@ -155,3 +148,23 @@ function newDateAt0() {
 
   return date
 }
+
+const mapStateToProps = state => ({
+  user: state.user,
+  days: state.days,
+  grocery_bank: state.grocery_bank,
+  meals: state.meals,
+  ingredients: state.ingredients,
+  total: state.total
+})
+
+const mapDispatchToProps = dispatch => {
+  return {
+    // setUserDays: user => dispatch(setUserDays(user)),
+    // setUserGroceryBank: user => dispatch(setUserGroceryBank(user)),
+    // setUserMeals: user => dispatch(setUserMeals(user))
+    mapTotal: (requirements, date) => dispatch(mapTotal(requirements, date))
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Dashboard)
