@@ -35,6 +35,7 @@ request(options, function(error, response, body) {
   request(renewOptions, function(error, response, body) {
     if (error) throw new Error(error)
 
+    console.log(response)
     console.log('Token renewed with success')
   })
 })
