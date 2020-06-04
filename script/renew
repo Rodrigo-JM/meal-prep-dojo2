@@ -14,9 +14,5 @@
 # So we set the `-e` flag.
 set -e
 
-node ./script/request.js > ./script/newToken.txt
-
-NEW_TOKEN=$(<./script/newToken.txt)
-
-heroku config:set FAT_SECRET=$NEW_TOKEN
+node ./script/request.js
 

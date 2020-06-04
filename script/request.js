@@ -19,6 +19,22 @@ var options = {
 
 request(options, function(error, response, body) {
   if (error) throw new Error(error)
+  var renewOptions = {
+    url: 'https://api.heroku.com/apps/meal-prep-dojo/config-vars',
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer 94f590a8-d107-4ad9-a10c-c81180647878`,
+      Accept: 'application/vnd.heroku+json; version=3'
+    },
+    json: {
+      FAT_SECRET: body.access_token
+    }
+  }
 
-  console.log(body.access_token)
+  request(renewOptions, function(error, response, body) {
+    if (error) throw new Error(error)
+
+    console.log('Token renewed with success')
+  })
 })
