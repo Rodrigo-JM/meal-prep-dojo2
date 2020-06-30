@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 /* eslint-disable camelcase */
 import React, {Component} from 'react'
 import SearchFood from './SearchFood'
@@ -27,20 +28,48 @@ export default class NewFoodMain extends Component {
       } else {
         serving = food.servings.serving
       }
-      console.log(serving)
-      serving = {
-        calories_per_gram:
-          Number(serving.calories) / Number(serving.metric_serving_amount),
-        carb_per_gram:
-          Number(serving.carbohydrate) / Number(serving.metric_serving_amount),
-        fat_per_gram:
-          Number(serving.fat) / Number(serving.metric_serving_amount),
-        protein_per_gram:
-          Number(serving.protein) / Number(serving.metric_serving_amount),
-        fiber_per_gram:
-          Number(serving.fiber) / Number(serving.metric_serving_amount),
-        size: Number(serving.metric_serving_amount)
+
+      if (serving.metric_serving_unit === 'oz') {
+        serving = {
+          calories_per_gram:
+            Number(serving.calories ? serving.calories : 0) /
+            (Number(serving.metric_serving_amount) * 28.3495),
+          carb_per_gram:
+            Number(serving.carbohydrate ? serving.carbohydrate : 0) /
+            (Number(serving.metric_serving_amount) * 28.3495),
+          fat_per_gram:
+            Number(serving.fat ? serving.fat : 0) /
+            (Number(serving.metric_serving_amount) * 28.3495),
+          protein_per_gram:
+            Number(serving.protein ? serving.protein : 0) /
+            (Number(serving.metric_serving_amount) * 28.3495),
+          fiber_per_gram:
+            Number(serving.fiber ? serving.fiber : 0) /
+            (Number(serving.metric_serving_amount) * 28.3495),
+          size: Number(serving.metric_serving_amount) * 28.3495
+        }
+      } else {
+        serving = {
+          calories_per_gram:
+            Number(serving.calories ? serving.calories : 0) /
+            Number(serving.metric_serving_amount),
+          carb_per_gram:
+            Number(serving.carbohydrate ? serving.carbohydrate : 0) /
+            Number(serving.metric_serving_amount),
+          fat_per_gram:
+            Number(serving.fat ? serving.fat : 0) /
+            Number(serving.metric_serving_amount),
+          protein_per_gram:
+            Number(serving.protein ? serving.protein : 0) /
+            Number(serving.metric_serving_amount),
+          fiber_per_gram:
+            Number(serving.fiber ? serving.fiber : 0) /
+            Number(serving.metric_serving_amount),
+          size: Number(serving.metric_serving_amount)
+        }
       }
+
+      console.log(serving)
 
       return serving
     }
