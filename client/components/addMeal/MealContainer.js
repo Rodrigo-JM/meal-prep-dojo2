@@ -22,8 +22,44 @@ export default class MealContainer extends Component {
     }
 
     this.addIngredient = this.addIngredient.bind(this)
+    this.removeIngredient = this.removeIngredient.bind(this)
     this.submitMeal = this.submitMeal.bind(this)
     this.handleChange = this.handleChange.bind(this)
+  }
+
+  removeIngredient(ingredient) {
+    let newIngredients = this.state.meal.ingredients.filter(
+      ing => ing.food_id !== ingredient.food_id
+    )
+
+    let totalInfo = newIngredients.reduce(
+      (total, i) => {
+        Object.keys(i.food_info)
+          .filter(key => key !== 'serving')
+          .forEach(info => {
+            total[info] = total[info] + Number(i.food_info[info])
+          })
+
+        return total
+      },
+      {
+        calories: 0,
+        carb: 0,
+        fat: 0,
+        protein: 0,
+        fiber: 0
+      }
+    )
+
+    let mealchange = {
+      ...this.state.meal,
+      ingredients: newIngredients,
+      totalInfo
+    }
+
+    this.setState({
+      meal: mealchange
+    })
   }
 
   addIngredient(ingredient) {
@@ -116,6 +152,13 @@ export default class MealContainer extends Component {
                     <p>{ingredient.food_name}</p>
                     <p>kcal: {ingredient.food_info.calories}</p>
                     <p>grams: {ingredient.food_info.serving}</p>
+
+                    <button
+                      onClick={() => this.removeIngredient(ingredient)}
+                      type="submit"
+                    >
+                      Remove
+                    </button>
                   </li>
                 )
               })}
