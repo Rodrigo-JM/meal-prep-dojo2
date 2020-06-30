@@ -46,12 +46,23 @@ class App extends Component {
     this.props.setUserMeals(this.props.user)
   }
 
+  async logoutUser() {
+    try {
+      await firebase.auth().signOut()
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
   render() {
     return (
       <Bouncer>
         <Router>
           <Navbar />
           <div className="main">
+            <button type="submit" onClick={() => this.logoutUser()}>
+              Logout
+            </button>
             <Switch>
               <Route
                 exact
