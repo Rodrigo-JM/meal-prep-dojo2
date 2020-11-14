@@ -6,4 +6,12 @@ With MPD you can create your meals by picking and choosing ingredients from FatS
 
 # Technologies
 
-Firebase for database, authentication, cloud functions.
+Firebase for database, authentication and cloud functions.
+
+React.Js and Redux for state driven front-end code.
+
+Express.js as my back-end framework. I need to have a server to bypass CORS restriction and use FatSecret's API. Otherwise, I would go with serverless for this application.
+
+# Components Architecture
+
+
