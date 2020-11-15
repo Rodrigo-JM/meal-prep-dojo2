@@ -44,7 +44,7 @@ Express.js as my back-end framework. I need to have a server to bypass CORS rest
  
  My store looks like this:
  
- ![My beautiful store](https://imgur.com/a/s3lV21n)
+ ![My beautiful store](https://i.imgur.com/WdisbFX.jpg)
  
  GroceryBank, Days and Meals are basically pipelining snapshots from Firestore and firing actions to adjust state. I won't go deep into the logic I used. Feel free to contact me if you are interested. 
  
