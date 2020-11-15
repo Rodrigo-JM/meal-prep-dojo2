@@ -66,9 +66,9 @@ Express.js as my back-end framework. I need to have a server to bypass CORS rest
 
 One the biggest challenges is keeping this working. I had to implement FixieSocks to have a static IP and request nutritional data from FatSecret's API, but it's USD 29.99 a month (for a reasonable amount of requests, remember autocomplete logic and calling the api for evey key stroke), and I do not allow myself to pay that when this is still so unrefined. If anyone wants to try this out live, I have to make adjustments beforehand.
 
-While coding this, the biggest challenge was making sure my cloud functions where mapping required ingredients correcly. The biggest issue is matching ingredients and timestamps togheter so that both functions can communicated adequately. 
+While coding this, the biggest challenge was making sure my cloud functions where mapping required ingredients correctly. The biggest issue is matching ingredients and timestamps togheter so that both functions can communicated adequately. 
 
-Finding a proper application state that could provide all the information I needed was also a big obstacle. Some information only come in after certain calls are made to the database, and it could break the state if those aren't registered, but at the same time I can't use some variables that are connected to firestore because if they are undefined at the time of rendering all hell breaks loose.
+Finding a proper application state that could provide all the information I needed was also a big obstacle. Some information only come in after certain calls are made to the database, and it could break the state if those aren't registered, but at the same time I can't use some variables that are connected to firestore. If they are undefined at the time of rendering all hell breaks loose.
 
 Next steps are: clean useless boilerplate code, refactoring component names, deleting console.logs, implementing material-ui for better cards, menus, lists, buttons, forms and possibily some good modals.
 
